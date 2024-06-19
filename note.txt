@@ -1,0 +1,13 @@
+# Cửa sổ Báo Cáo Doanh Thu
+class BaoCaoDoanhThu(QMainWindow):
+    def __init__(self):
+        super(BaoCaoDoanhThu, self).__init__()
+        uic.loadUi("BaoCaoDoanhThu.ui", self)
+        center_widget(self)
+        self.btnThoatb.clicked.connect(self.ThoatTrangChu)
+
+    def ThoatTrangChu(self):
+        widget.setFixedWidth(981)
+        widget.setFixedHeight(684)
+        center_widget(widget)
+        widget.setCurrentIndex(1)

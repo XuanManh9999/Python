@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1185</width>
-    <height>0</height>
+    <width>1213</width>
+    <height>723</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,7 +19,7 @@
      <rect>
       <x>0</x>
       <y>0</y>
-      <width>1191</width>
+      <width>1211</width>
       <height>721</height>
      </rect>
     </property>
@@ -159,7 +159,7 @@
        <string notr="true">font: 14pt &quot;MS Shell Dlg 2&quot;;</string>
       </property>
       <property name="placeholderText">
-       <string>Vị trí ngồi...</string>
+       <string>Giá vé...</string>
       </property>
      </widget>
      <widget class="QLineEdit" name="txtSoLuong">
@@ -178,22 +178,6 @@
        <string>Số lượng...</string>
       </property>
      </widget>
-     <widget class="QLineEdit" name="txtThoiHanVe">
-      <property name="geometry">
-       <rect>
-        <x>440</x>
-        <y>100</y>
-        <width>561</width>
-        <height>41</height>
-       </rect>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">font: 14pt &quot;MS Shell Dlg 2&quot;;</string>
-      </property>
-      <property name="placeholderText">
-       <string>Thời hạn vé...</string>
-      </property>
-     </widget>
      <widget class="QLineEdit" name="txtIDPhim">
       <property name="geometry">
        <rect>
@@ -210,7 +194,7 @@
        <string>ID Phim...</string>
       </property>
      </widget>
-     <widget class="QLineEdit" name="txtLichChieu">
+     <widget class="QLineEdit" name="txtIDLichChieu">
       <property name="geometry">
        <rect>
         <x>440</x>
@@ -226,19 +210,19 @@
        <string>ID lịch chiếu...</string>
       </property>
      </widget>
-    </widget>
-    <widget class="QListView" name="lstPhim">
-     <property name="geometry">
-      <rect>
-       <x>0</x>
-       <y>500</y>
-       <width>1191</width>
-       <height>231</height>
-      </rect>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">font: 12pt &quot;Arial&quot;;</string>
-     </property>
+     <widget class="QDateEdit" name="dateThoiHanVe">
+      <property name="geometry">
+       <rect>
+        <x>440</x>
+        <y>100</y>
+        <width>561</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">font: 14pt &quot;MS Shell Dlg 2&quot;;</string>
+      </property>
+     </widget>
     </widget>
     <widget class="QPushButton" name="btnThemv">
      <property name="geometry">
@@ -343,6 +327,81 @@ QPushButton:hover{
      <property name="text">
       <string>Thoát</string>
      </property>
+    </widget>
+    <widget class="QTableWidget" name="tableWidget">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>530</y>
+       <width>1221</width>
+       <height>201</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QTableWidget{
+	color:rgb(0, 0, 0)
+	font: 14pt &quot;MS Shell Dlg 2&quot;;
+	Background-color:rgb(255, 255, 255)
+}</string>
+     </property>
+     <property name="rowCount">
+      <number>0</number>
+     </property>
+     <column>
+      <property name="text">
+       <string>ID</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Tên Vé</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Loại vé</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Vị trí ngồi</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Giá vé</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Số lượng vé</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Thời hạn vé</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>ID phim</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>ID lich chiếu</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Create At</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Update At</string>
+      </property>
+     </column>
     </widget>
    </widget>
   </widget>
