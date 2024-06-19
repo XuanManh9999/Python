@@ -94,6 +94,9 @@
       <property name="styleSheet">
        <string notr="true">font: 14pt &quot;MS Shell Dlg 2&quot;;</string>
       </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
       <property name="placeholderText">
        <string>ID vé...</string>
       </property>
@@ -178,38 +181,6 @@
        <string>Số lượng...</string>
       </property>
      </widget>
-     <widget class="QLineEdit" name="txtIDPhim">
-      <property name="geometry">
-       <rect>
-        <x>440</x>
-        <y>160</y>
-        <width>561</width>
-        <height>41</height>
-       </rect>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">font: 14pt &quot;MS Shell Dlg 2&quot;;</string>
-      </property>
-      <property name="placeholderText">
-       <string>ID Phim...</string>
-      </property>
-     </widget>
-     <widget class="QLineEdit" name="txtIDLichChieu">
-      <property name="geometry">
-       <rect>
-        <x>440</x>
-        <y>220</y>
-        <width>561</width>
-        <height>41</height>
-       </rect>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">font: 14pt &quot;MS Shell Dlg 2&quot;;</string>
-      </property>
-      <property name="placeholderText">
-       <string>ID lịch chiếu...</string>
-      </property>
-     </widget>
      <widget class="QDateEdit" name="dateThoiHanVe">
       <property name="geometry">
        <rect>
@@ -221,6 +192,44 @@
       </property>
       <property name="styleSheet">
        <string notr="true">font: 14pt &quot;MS Shell Dlg 2&quot;;</string>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="cbPhim">
+      <property name="geometry">
+       <rect>
+        <x>440</x>
+        <y>220</y>
+        <width>561</width>
+        <height>41</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="cbLichChieu">
+      <property name="geometry">
+       <rect>
+        <x>440</x>
+        <y>280</y>
+        <width>561</width>
+        <height>41</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="txtDaBan">
+      <property name="geometry">
+       <rect>
+        <x>440</x>
+        <y>160</y>
+        <width>561</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>14</pointsize>
+       </font>
+      </property>
+      <property name="placeholderText">
+       <string>Vé đã bán...</string>
       </property>
      </widget>
     </widget>
@@ -375,6 +384,11 @@ QPushButton:hover{
      <column>
       <property name="text">
        <string>Số lượng vé</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Vé đã bán</string>
       </property>
      </column>
      <column>

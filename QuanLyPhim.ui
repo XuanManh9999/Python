@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1215</width>
-    <height>0</height>
+    <height>356</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -93,6 +93,9 @@
       </property>
       <property name="styleSheet">
        <string notr="true">font: 14pt &quot;MS Shell Dlg 2&quot;;</string>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
       </property>
       <property name="placeholderText">
        <string>ID phim...</string>
