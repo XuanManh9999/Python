@@ -1,8 +1,10 @@
 from PyQt6 import QtCore, QtGui, QtWidgets, uic
-from PyQt6.QtWidgets import QApplication, QMainWindow, QMessageBox, QStackedWidget, QTableWidgetItem
+from PyQt6.QtWidgets import QApplication, QMainWindow, QMessageBox, QStackedWidget, QTableWidgetItem, QFileDialog, QMessageBox
 import sys
 from database import Database
-
+import MySQLdb as mdb
+import pandas as pd
+import matplotlib.pyplot as plt
 import pdb;   # Add this line at the start of the method where you suspect the issue
 
 
@@ -25,7 +27,7 @@ class DangNhap(QMainWindow):
     def DangNhap(self):
         username = self.txtName.text()
         password = self.txtPass.text()
-        if username == "1" and password == "1":
+        if username == "admin" and password == "123":
             widget.setFixedWidth(981)
             widget.setFixedHeight(684)
             center_widget(widget)
@@ -46,12 +48,19 @@ class TrangChu(QMainWindow):
         self.btnQuanLyVe.clicked.connect(self.QuanLyVe)
         self.btnQuanlyDichVu.clicked.connect(self.QuanLyDichVu)
         self.btnBaoCao.clicked.connect(self.BaoCaoDoanhThu)
+        # tao
+        self.db = Database()
+        self.btnDangXuat.clicked.connect(self.ThoatTrangChu)
+
+
+
 
     def QuanLyPhim(self):
         widget.setFixedWidth(1215)
         widget.setFixedHeight(721)
         center_widget(widget)
         widget.setCurrentIndex(5)
+
 
     def QuanLyLichChieu(self):
         widget.setFixedWidth(1121)
@@ -74,6 +83,9 @@ class TrangChu(QMainWindow):
         widget.setFixedWidth(1200)
         center_widget(widget)
         widget.setCurrentIndex(2)
+    def ThoatTrangChu(self):
+        sys.exit()
+
 
 # Cửa sổ Báo Cáo Doanh Thu
 class BaoCaoDoanhThu(QMainWindow):
@@ -82,7 +94,68 @@ class BaoCaoDoanhThu(QMainWindow):
         uic.loadUi("BaoCaoDoanhThu.ui", self)
         center_widget(self)
         self.btnThoatb.clicked.connect(self.ThoatTrangChu)
+        self.db = Database()
+        self.tableWidget = self.findChild(QtWidgets.QTableWidget, 'tableWidget')
+        self.btnTheoVeBan.clicked.connect(self.TheoVeBan)
+        self.btnTheoDichVu.clicked.connect(self.theo_dich_vu)
+        self.btnInbaocao.clicked.connect(self.InBaoCao)
 
+
+    def TheoVeBan(self):
+        #loadding ra bao cao ve ban
+        data = self.db.tinh_doanh_thu_theo_ve()
+        #id phim, lich chieu o vi tri 8, 9 lay get ra ten roi loadding ra
+        # them cac cot
+        self.tableWidget.setColumnCount(12)
+        self.tableWidget.setHorizontalHeaderLabels(["Tên vé", "Loại vé", "Vị trí ngồi", "Giá vé", "Số lượng vé", "Vé đã bán", "Thời hạn vé", "Tên phim", "Lịch chiếu", "Doanh thu", "Ngày tạo", "Ngày cập nhật"])
+        #them du lieu vao bang
+        self.tableWidget.setRowCount(0)
+        for row_number, row_data in enumerate(data):
+            self.tableWidget.insertRow(row_number)
+            for column_number, data in enumerate(row_data):
+                # neu la id phim hoac id lich chieu thi se get ten phim va lich chieu ra
+                if column_number == 7:
+                    name_phim = self.db.select_phim_by_id(int(data))
+                    self.tableWidget.setItem(row_number, column_number, QtWidgets.QTableWidgetItem(str(name_phim[0])))
+                elif column_number == 8:
+                    name_lich_chieu = self.db.select_lich_chieu_by_id(int(data))
+                    self.tableWidget.setItem(row_number, column_number, QtWidgets.QTableWidgetItem(str(name_lich_chieu[0])))
+                else:
+                    self.tableWidget.setItem(row_number, column_number, QtWidgets.QTableWidgetItem(str(data)))
+
+    def theo_dich_vu(self):
+        #loadding ra bao cao theo phim
+        data = self.db.tinh_doanh_thu_theo_dich_vu()
+        # them cac cot
+        self.tableWidget.setColumnCount(7)
+        self.tableWidget.setHorizontalHeaderLabels(["Tên dịch vụ", "Giá dịch vụ", "Phí dịch vụ", "Đã bán", "Doanh thu", "Ngày tạo", "Ngày cập nhật"])
+        #them du lieu vao bang
+        self.tableWidget.setRowCount(0)
+        for row_number, row_data in enumerate(data):
+            self.tableWidget.insertRow(row_number)
+            for column_number, data in enumerate(row_data):
+                self.tableWidget.setItem(row_number, column_number, QtWidgets.QTableWidgetItem(str(data)))
+
+    def InBaoCao(self):
+        # lay du lieu co trong table Widget
+        data = []
+        for row in range(self.tableWidget.rowCount()):
+            row_data = []
+            for column in range(self.tableWidget.columnCount()):
+                item = self.tableWidget.item(row, column)
+                if item is not None:
+                    row_data.append(item.text())
+                else:
+                    row_data.append("")
+            data.append(row_data)
+        df = pd.DataFrame(data, columns=["Tên vé", "Loại vé", "Vị trí ngồi", "Giá vé", "Số lượng vé", "Vé đã bán", "Thời hạn vé", "Tên phim", "Lịch chiếu", "Doanh thu", "Ngày tạo", "Ngày cập nhật"])
+        # tao file dialog de luu file
+        file_path, _ = QFileDialog.getSaveFileName(self, "Save File", "", "Excel files (*.xlsx)")
+        if file_path:
+            df.to_excel(file_path, index=False)
+            QMessageBox.information(self, "Thông báo", "Đã lưu báo cáo thành công.")
+        else:
+            QMessageBox.warning(self, "Lỗi", "Vui lòng chọn nơi lưu file.")
 
     def ThoatTrangChu(self):
         widget.setFixedWidth(981)
@@ -104,6 +177,12 @@ class QuanLyDichVu(QMainWindow):
         self.btnSuad.clicked.connect(self.update_selected_dich_vu)
         self.btnXoad.clicked.connect(self.delete_dich_vu)
         self.btnThoatd.clicked.connect(self.ThoatTrangChu)
+    def clearData(self):
+        self.txtIDichVu.clear()
+        self.txtITenDichVu.clear()
+        self.txtGiadichvu.clear()
+        self.txtPhidichvu.clear()
+        self.txtDaBan.clear()
 
     def load_data(self):
         try:
@@ -156,6 +235,7 @@ class QuanLyDichVu(QMainWindow):
         try:
             self.db.insert_dich_vu(ten_dich_vu, gia_dich_vu, phi_dich_vu, da_ban)
             QMessageBox.information(self, "Thông báo", "Đã thêm dịch vụ thành công.")
+            self.clearData()
             self.load_data()
         except Exception as e:
             QMessageBox.warning(self, "Lỗi", f"Lỗi khi thêm dịch vụ: {str(e)}")
@@ -174,6 +254,7 @@ class QuanLyDichVu(QMainWindow):
 
             self.db.update_dich_vu(id, ten_dich_vu, gia_dich_vu, phi_dich_vu, da_ban)
             QMessageBox.information(self, "Thông báo", "Đã cập nhật dịch vụ thành công.")
+            self.clearData()
             self.load_data()
         except Exception as e:
             QMessageBox.warning(self, "Lỗi", f"Lỗi khi cập nhật dịch vụ: {str(e)}")
@@ -183,6 +264,7 @@ class QuanLyDichVu(QMainWindow):
             id = int(self.txtIDichVu.text())
             self.db.delete_dich_vu(id)
             QMessageBox.information(self, "Thông báo", "Đã xóa dịch vụ thành công.")
+            self.clearData()
             self.load_data()
         except Exception as e:
             QMessageBox.warning(self, "Lỗi", f"Lỗi khi xóa dịch vụ: {str(e)}")
@@ -220,7 +302,13 @@ class QuanLyLichChieu(QMainWindow):
                 self.cbPhim.addItem(phim[1])
         except Exception as e:
             QMessageBox.warning(self, "Lỗi", f"Lỗi khi tải dữ liệu lịch chiếu: {str(e)}")
-
+    def clear_data(self):
+        self.txtIDLichchieu.clear()
+        self.txtPhongchieu.clear()
+        self.txtDiadiemchieu.clear()
+        self.txtThoigianchieu.clear()
+        self.txtSoluong.clear()
+        self.cbPhim.setCurrentIndex(0)
     def select_row(self):
        #khi select row thi se hien thi thong tin len cac o nhap
        # voi cbPhim thi lay id roi tim thang do trong danh sach phim
@@ -261,11 +349,7 @@ class QuanLyLichChieu(QMainWindow):
             self.db.insert_lich_chieu(thoi_gian_chieu, phong_chieu, dia_diem_chieu, so_luong_cho_ngoi, id_phim[0])
             QMessageBox.information(self, "Thông báo", "Đã thêm lịch chiếu thành công.")
             self.load_data()
-            #clear all input
-            self.txtPhongchieu.clear()
-            self.txtDiadiemchieu.clear()
-            self.txtThoigianchieu.clear()
-            self.txtSoluong.clear()
+            self.clear_data()
 
         except Exception as e:
             QMessageBox.warning(self, "Lỗi", f"Lỗi khi thêm lịch chiếu: {str(e)}")
@@ -283,6 +367,7 @@ class QuanLyLichChieu(QMainWindow):
             self.db.update_lich_chieu(id, thoi_gian_chieu, phong_chieu, dia_diem_chieu, so_luong_cho_ngoi, id_phim)
             QMessageBox.information(self, "Thông báo", "Đã cập nhật lịch chiếu thành công.")
             self.load_data()
+            self.clear_data()
         except Exception as e:
             QMessageBox.warning(self, "Lỗi", f"Lỗi khi cập nhật lịch chiếu: {str(e)}")
 
@@ -291,6 +376,7 @@ class QuanLyLichChieu(QMainWindow):
         try:
             self.db.delete_lich_chieu(id)
             QMessageBox.information(self, "Thông báo", "Đã xóa lịch chiếu thành công.")
+            self.clear_data()
             self.load_data()
         except Exception as e:
             QMessageBox.warning(self, "Lỗi", f"Lỗi khi xóa lịch chiếu: {str(e)}")
@@ -319,11 +405,28 @@ class QuanLyPhim(QMainWindow):
         self.btnSua.clicked.connect(self.update_selected_phim)
         self.btnXoa.clicked.connect(self.delete_phim)
         self.btnThoat.clicked.connect(self.thoat_quan_ly_phim)
+        self.ve = QuanLyVe()
+        self.lich_chieu = QuanLyLichChieu()
         self.load_data()
 
+    # khoi tao mot phuong thuc se luong duoc goi khi mo cua so
+
+    def clear_data(self):
+        self.txtIDPhim.clear()
+        self.txtTenphim.clear()
+        self.txtTheloai.clear()
+        self.txtDanhgia.clear()
+        self.txtMota.clear()
+        self.txtTuoi.clear()
+        self.txtDaodien.clear()
+        self.txtDienvien.clear()
+        self.txtThoiluong.clear()
     def load_data(self):
-        print("Vao load_data")
         try:
+            self.ve.load_data()
+            self.ve.load_phim_list()
+            self.ve.load_lich_chieu_list()
+            self.lich_chieu.load_data()
             phim_list = self.db.read_phim()
             self.tableWidget.setRowCount(0)
 
@@ -392,12 +495,7 @@ class QuanLyPhim(QMainWindow):
             self.db.insert_phim(ten_phim, the_loai, danh_gia_phim, mo_ta, ngay_phat_hanh, do_tuoi, dao_dien, dien_vien, thoi_luong)
             QMessageBox.information(self, "Thông báo", "Đã thêm phim thành công.")
             #clear all input
-            self.txtTenphim.clear()
-            self.txtTheloai.clear()
-            self.txtDanhgia.clear()
-            self.txtMota.clear()
-            self.txtTuoi.clear()
-            self.txtDaodien.clear()
+            self.clear_data()
 
             self.load_data()
         except Exception as e:
@@ -418,6 +516,7 @@ class QuanLyPhim(QMainWindow):
 
             self.db.update_phim(id, ten_phim, the_loai, danh_gia_phim, mo_ta, ngay_phat_hanh, do_tuoi, dao_dien, dien_vien, thoi_luong)
             QMessageBox.information(self, "Thông báo", "Đã cập nhật thông tin phim thành công.")
+            self.clear_data()
             self.load_data()
         except Exception as e:
             QMessageBox.warning(self, "Lỗi", f"Lỗi khi cập nhật phim: {str(e)}")
@@ -427,6 +526,7 @@ class QuanLyPhim(QMainWindow):
             id = int(self.txtIDPhim.text())
             self.db.delete_phim(id)
             QMessageBox.information(self, "Thông báo", "Đã xóa phim thành công.")
+            self.clear_data()
             self.load_data()
         except Exception as e:
             QMessageBox.warning(self, "Lỗi", f"Lỗi khi xóa phim: {str(e)}")
@@ -442,24 +542,37 @@ class QuanLyVe(QMainWindow):
         center_widget(self)
         self.db = Database()
         self.tableWidget = self.findChild(QtWidgets.QTableWidget, 'tableWidget')
-        self.load_data()
-
         # Connect signals to slots
         self.tableWidget.itemSelectionChanged.connect(self.select_row)
         self.btnThemv.clicked.connect(self.add_ve)
         self.btnSuav.clicked.connect(self.update_selected_ve)
         self.btnXoav.clicked.connect(self.delete_ve)
         self.btnThoatv.clicked.connect(self.thoat_quan_ly_ve)
+        self.load_data()
 
+
+    def clear_data(self):
+        self.txtIDVe.clear()
+        self.txtTenVe.clear()
+        self.txtLoaiVe.clear()
+        self.txtViTriNgoi.clear()
+        self.txtGiaVe.clear()
+        self.txtSoLuong.clear()
+        self.txtDaBan.clear()
+        self.dateThoiHanVe.setDate(QtCore.QDate.currentDate())
+        self.cbPhim.setCurrentIndex(0)
+        self.cbLichChieu.setCurrentIndex(0)
+    def showEvent(self, event):
+        self.load_phim_list()
+        self.load_lich_chieu_list()
+        self.display_ve_list()
     def load_data(self):
         self.load_phim_list()
         self.load_lich_chieu_list()
-        ve_list = self.db.read_ve()
-        self.display_ve_list(ve_list)
-
+        self.display_ve_list()
     def load_phim_list(self):
-        phim_list = self.db.read_phim()
         self.cbPhim.clear()
+        phim_list =  self.db.read_phim()
         for phim in phim_list:
             self.cbPhim.addItem(phim[1])
 
@@ -469,7 +582,8 @@ class QuanLyVe(QMainWindow):
         for lich_chieu in lich_chieu_list:
             self.cbLichChieu.addItem(lich_chieu[3])
 
-    def display_ve_list(self, ve_list):
+    def display_ve_list(self):
+        ve_list = self.db.read_ve()
         self.tableWidget.setRowCount(0)
         for row_number, row_data in enumerate(ve_list):
             self.tableWidget.insertRow(row_number)
@@ -521,7 +635,6 @@ class QuanLyVe(QMainWindow):
         thoi_han_ve = self.dateThoiHanVe.date().toString("yyyy-MM-dd")
         id_phim = self.db.select_id_by_name(self.cbPhim.currentText())
         id_lich_chieu = self.db.select_id_by_name_lich_chieu(self.cbLichChieu.currentText())
-        print(id_phim, id_lich_chieu)
         #check xem co thieu thong tin nao khong neu co hien thong bao len man hinh
         if not all([ten_ve, loai_ve, vi_tri_ngoi, gia_ve, so_luong_ve, thoi_han_ve, id_phim, id_lich_chieu]):
             QMessageBox.warning(self, "Lỗi", "Vui lòng nhập đủ thông tin để thêm vé.")
@@ -531,12 +644,7 @@ class QuanLyVe(QMainWindow):
             self.db.insert_ve(ten_ve, loai_ve, vi_tri_ngoi, gia_ve, so_luong_ve, ve_da_ban, thoi_han_ve, id_phim, id_lich_chieu)
             QMessageBox.information(self, "Thông báo", "Đã thêm vé thành công.")
             self.load_data()
-            #clear all input
-            self.txtTenVe.clear()
-            self.txtLoaiVe.clear()
-            self.txtViTriNgoi.clear()
-            self.txtGiaVe.clear()
-            self.txtSoLuong.clear()
+            self.clear_data()
 
         except Exception as e:
             QMessageBox.warning(self, "Lỗi", f"Lỗi khi thêm vé: {str(e)}")
@@ -562,6 +670,7 @@ class QuanLyVe(QMainWindow):
         try:
             self.db.update_ve(id, ten_ve, loai_ve, vi_tri_ngoi, gia_ve, so_luong_ve, ve_da_ban, thoi_han_ve, id_phim, id_lich_chieu)
             QMessageBox.information(self, "Thông báo", "Đã cập nhật vé thành công.")
+            self.clear_data()
             self.load_data()
         except Exception as e:
             QMessageBox.warning(self, "Lỗi", f"Lỗi khi cập nhật vé: {str(e)}")
@@ -570,10 +679,11 @@ class QuanLyVe(QMainWindow):
 
     def delete_ve(self):
         # tuong tu them lam xoa
-        id = int(self.txtIDVe.text())
         try:
+            id = int(self.txtIDVe.text())
             self.db.delete_ve(id)
             QMessageBox.information(self, "Thông báo", "Đã xóa vé thành công.")
+            self.clear_data()
             self.load_data()
         except Exception as e:
             QMessageBox.warning(self, "Lỗi", f"Lỗi khi xóa vé: {str(e)}")

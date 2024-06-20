@@ -203,6 +203,11 @@
         <height>41</height>
        </rect>
       </property>
+      <property name="font">
+       <font>
+        <pointsize>14</pointsize>
+       </font>
+      </property>
      </widget>
      <widget class="QComboBox" name="cbLichChieu">
       <property name="geometry">
@@ -212,6 +217,11 @@
         <width>561</width>
         <height>41</height>
        </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>14</pointsize>
+       </font>
       </property>
      </widget>
      <widget class="QLineEdit" name="txtDaBan">
